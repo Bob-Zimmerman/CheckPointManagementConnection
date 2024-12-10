@@ -1,0 +1,23 @@
+#cloud-config
+password: "1qaz!QAZ"
+hostname: "TestSC"
+timezone: "Etc/GMT"
+clish:
+  - set user admin shell /bin/bash
+config_system:
+  maintenance_hash: "grub.pbkdf2.sha512.10000.614DE3DFE72E72D7D72139355DF35F9AF6335B16BA6487B40ED0F9F2A261014BB3AD8CE1310732696485B4FF43BF503D339FCAD0D2608AAC951DA437CF63DB94.F6C791782BEF20DED8BCCE548176E09A44DC34F20140200DDF75F106BB57EB9039A8C8AA50C34CBB78584B2F93FEAF1AE2A038E5143F3DF9582CC4BC905C4016"
+  domainname: "standingsmartcenter.mylab.test"
+  install_security_managment: true
+  install_mgmt_primary: true
+  mgmt_gui_clients_radio: "any"
+  mgmt_admin_radio: "gaia_admin"
+  download_info: true
+  upload_info: true
+  upload_crash_data: true
+runcmd:
+  - curl_cli http://169.254.169.254/jumbo/jumboScript.sh -o /home/admin/jumboScript.sh
+  - chmod u+x /home/admin/jumboScript.sh
+  - bash -c "nohup /home/admin/jumboScript.sh &"
+  - curl_cli http://169.254.169.254/postBootBuild.sh -o /home/admin/postBootBuild.sh
+  - chmod u+x /home/admin/postBootBuild.sh
+  - ln -s /home/admin/postBootBuild.sh /etc/rc.d/rc3.d/S99zzzPostBootBuild

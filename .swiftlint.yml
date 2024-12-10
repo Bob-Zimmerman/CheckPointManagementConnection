@@ -1,0 +1,13 @@
+{
+	"disabled_rules": [
+		opening_brace,
+		todo,
+		trailing_whitespace,
+	],
+	"excluded": [
+	],
+	"line_length": {
+	    "ignores_interpolated_strings": true,
+	    "ignores_urls": true
+	}
+}

@@ -1,0 +1,32 @@
+{
+  "configurations" : [
+    {
+      "id" : "EEE6079F-63C4-4886-9C58-184B735CEF5A",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : {
+      "targets" : [
+        {
+          "containerPath" : "container:",
+          "identifier" : "CheckPointManagementConnection",
+          "name" : "CheckPointManagementConnection"
+        }
+      ]
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "CheckPointManagementConnectionTests",
+        "name" : "CheckPointManagementConnectionTests"
+      }
+    }
+  ],
+  "version" : 1
+}
