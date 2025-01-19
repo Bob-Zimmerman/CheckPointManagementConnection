@@ -28,7 +28,7 @@ Point expects.
 Testing
 ========================================
 A lot of the code involves network calls, and obviously those are hard to test
-without a target server to connect to. In the `Tests/Target Build` directory,
+without a target server to connect to. In my [CPAPI-Test-Target](https://github.com/Bob-Zimmerman/CPAPI-Test-Target/) repository,
 there are directions and files to build a suitable test target. With such a
 target running, the tests have 100% code coverage as of 2024-12-10.
 
@@ -56,3 +56,4 @@ versions, then figuring out the right way to differentiate between them.
 - Tests which talk to a management server sometimes fail, then succeed when they
  are run again. I haven't yet spent the time to figure out what's wrong. I
  suspect it's some kind of problem on the management server like a rate limit.
+ Test repetition partially works around this.
