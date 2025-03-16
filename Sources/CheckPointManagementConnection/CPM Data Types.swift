@@ -34,8 +34,8 @@ public enum CPMError: Error {
 }
 
 public struct CPMDate: Codable, Sendable {
-	let iso8601: String
-	let posix: Date
+	public let iso8601: String
+	public let posix: Date
 	
 	enum CodingKeys: String, CodingKey {
 		case iso8601 = "iso-8601"
@@ -79,12 +79,12 @@ internal struct CPMLoginResponse: Codable, Identifiable, Sendable {
 }
 
 public struct PolicyPushParameters: Sendable {
-	let access: Bool
-	let desktopSecurity: Bool
-	let qos: Bool
-	let threatPrevention: Bool
-	let installOnAllClusterMembersOrFail: Bool
-	let prepareOnly: Bool
+	public let access: Bool
+	public let desktopSecurity: Bool
+	public let qos: Bool
+	public let threatPrevention: Bool
+	public let installOnAllClusterMembersOrFail: Bool
+	public let prepareOnly: Bool
 	
 	public init(
 		access: Bool,
