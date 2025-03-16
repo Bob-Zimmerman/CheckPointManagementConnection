@@ -15,10 +15,7 @@ public actor CheckPointManagement {
 	public nonisolated let apiVersion: String
 	public nonisolated let readOnly: Bool
 	internal let cpmAPISession: URLSession
-	internal let cpmJSONDecoder: JSONDecoder = {
-		let decoder = JSONDecoder()
-		decoder.dateDecodingStrategy = JSONDecoder.DateDecodingStrategy.millisecondsSince1970
-		return decoder }()
+	internal let cpmJSONDecoder = JSONDecoder()
 	internal var timer: Timer?
 	
 	internal init(

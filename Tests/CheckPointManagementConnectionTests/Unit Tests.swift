@@ -131,4 +131,28 @@ import Testing
 	@Test func taskStatusNil() throws {
 		#expect("in progress" == CheckPointManagement.getTaskStatus(nil))
 	}
+	
+	@Test func decodeDateInSeconds() throws {
+		let jsonData = Data("""
+{
+  "iso-8601" : "2025-03-16T14:56+0000",
+  "posix" : 1742137014
+}
+""".utf8)
+		let date: Date = try JSONDecoder().decode(CPMDate.self, from: jsonData).posix
+		#expect(1 > abs(date.distance(to: Date(timeIntervalSince1970: 1742137014))))
+	}
+	
+	@Test func decodeDateInMilliseconds() throws {
+		let jsonData = Data("""
+{
+  "posix" : 1728954737923,
+  "iso-8601" : "2024-10-15T01:12+0000"
+}
+""".utf8)
+		let date: Date = try JSONDecoder().decode(CPMDate.self, from: jsonData).posix
+		print("Decoded date: \(date)")
+		print("Distance to target date: \(date.distance(to: Date(timeIntervalSince1970: 1728954738)))")
+		#expect(1 > abs(date.distance(to: Date(timeIntervalSince1970: 1728954738))))
+	}
 }

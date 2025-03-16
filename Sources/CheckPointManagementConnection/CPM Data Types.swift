@@ -41,6 +41,30 @@ public struct CPMDate: Codable, Sendable {
 		case iso8601 = "iso-8601"
 		case posix
 	}
+	
+	public init(from decoder: Decoder)
+	throws {
+		// Check Point's management API doesn't actually return valid ISO 8601
+		// or valid POSIX timstamps in most cases. The "iso-8601" value is
+		// missing the seconds, and the "posix" value might be seconds (POSIX;
+		// I've only seen this in login responses) or milliseconds (not POSIX;
+		// I've seen this everywhere this date object is used except for login
+		// responses). Here, I decode the "ISO" form as just a string, then try
+		// to detect the size of the value in the "posix" key to decode
+		// appropriately.
+		let values = try decoder.container(keyedBy: CodingKeys.self)
+		iso8601 = try values.decode(String.self, forKey: .iso8601)
+		if let posixValue = try? values.decode(Int32.self, forKey: .posix) {
+			// If it fits in 32 bits, it's very likely to be real POSIX.
+			posix = Date(timeIntervalSince1970: TimeInterval(posixValue))
+		} else {
+			// If it doesn't fit in 32 bits, it's probably milliseconds. Decode
+			// as a Double so rounding works when dividing by 1000. A Double has
+			// 52 bits of significand, so it should fit +/- 142658 years.
+			let posixValue = try values.decode(Double.self, forKey: .posix)
+			posix = Date(timeIntervalSince1970: TimeInterval(round(posixValue/1000)))
+		}
+	}
 }
 
 internal struct CPMLoginResponse: Codable, Identifiable, Sendable {
