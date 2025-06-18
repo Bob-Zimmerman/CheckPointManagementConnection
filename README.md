@@ -30,9 +30,9 @@ Testing
 A lot of the code involves network calls, and obviously those are hard to test
 without a target server to connect to. In my [CPAPI-Test-Target](https://github.com/Bob-Zimmerman/CPAPI-Test-Target/) repository,
 there are directions and files to build a suitable test target. With such a
-target running, the tests have 100% code coverage as of 2024-12-10.
+target running, the tests have 100% code coverage as of 2025-06-18.
 
-As of 2024-12-10, the purely local tests cover 44% of the code.
+As of 2025-06-18, the purely local tests cover 47.8% of the code.
 
 `Test Support.swift` contains a set of variables which the tests use. If you
 want to use your own test target, you can use it to customize the tests to match
@@ -48,10 +48,8 @@ The system will prompt you for your password if needed.
 
 To-Do
 ========================================
-- Build more robust error handling. Check Point does not appear to use HTTP
-return codes consistently. I've seen the code returned by a given problem change
-between versions. This will require collecting exemplar errors from many
-versions, then figuring out the right way to differentiate between them. 
+- Collect exemplar errors from various versions. I'd like to support all the way
+ back to R80, but that will take time.
 
 - Tests which talk to a management server sometimes fail, then succeed when they
  are run again. I haven't yet spent the time to figure out what's wrong. I

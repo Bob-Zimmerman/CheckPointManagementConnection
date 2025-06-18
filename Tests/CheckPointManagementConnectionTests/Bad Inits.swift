@@ -43,7 +43,7 @@ import Testing
 	}
 	
 	@Test func noApi() async {
-		await #expect(throws: CPMError.badCredentials) { _ = try await CheckPointManagement(
+		await #expect(throws: CPMError.connectionProhibited) { _ = try await CheckPointManagement(
 			url: TestData.url,
 			username: TestData.noApiUser,
 			password: TestData.password,

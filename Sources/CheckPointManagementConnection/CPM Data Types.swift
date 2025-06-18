@@ -31,6 +31,19 @@ public enum CPMError: Error {
 	public static let invalidObject = NSError(domain: CPMAPIErrorDomain, code: -5, userInfo: [
 		NSLocalizedDescriptionKey: NSLocalizedString("Call made to change an invalid object", comment: "An error indicating the user has tried to perform an action, but the object they tried to perform it on doesn't exist."), // swiftlint:disable:this line_length
 		NSLocalizedRecoverySuggestionErrorKey: NSLocalizedString("You made a call to perform an action with an object, but the object doesn't exist.", comment: "Informative text describing a session error.") ]) // swiftlint:disable:this line_length
+	public static let accountLocked = NSError(domain: CPMAPIErrorDomain, code: -6, userInfo: [
+		NSLocalizedDescriptionKey: NSLocalizedString("Admin account locked", comment: "An error indicating the tried to log in to an admin account, but it's locked."), // swiftlint:disable:this line_length
+		NSLocalizedRecoverySuggestionErrorKey: NSLocalizedString("Your credentials were accepted, but your account is locked. Contact another administrator to unlock your account.", comment: "Informative text describing a session error.") ]) // swiftlint:disable:this line_length
+}
+
+public struct CPMApiError: Error, Decodable, Sendable {
+	public let code: String
+	public let message: String
+	public let errors: [CPMApiErrorDetail]?
+}
+
+public struct CPMApiErrorDetail: Decodable, Sendable {
+	public let message: String
 }
 
 public struct CPMDate: Codable, Sendable {

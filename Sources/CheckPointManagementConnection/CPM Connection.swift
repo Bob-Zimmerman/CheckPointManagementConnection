@@ -112,18 +112,24 @@ public actor CheckPointManagement {
 			CheckPointManagement.logger.error("ERROR: Couldn't convert API call response to an HTTP URL Response")
 			throw DecodingError.typeMismatch(HTTPURLResponse.self, DecodingError.Context(
 				codingPath: [], debugDescription: "Couldn't convert API call response to an HTTP URL Response")) }
+		if response.statusCode == 200 { return returned.data }
+		
+		let apiError = try? JSONDecoder().decode(CPMApiError.self, from: returned.data)
+		
 		// TODO: Get error exemplars and make more robust error handling.
 		// Check Point doesn't seem to use HTTP return codes consistently.
-		switch response.statusCode {
-		case 200:
-			return returned.data
-		case 400:
+		switch (response.statusCode, apiError?.code, apiError?.message) {
+		case (400, "err_login_failed", "Authentication to server failed."):
 			throw CPMError.badCredentials
-		case 403:
+		case (400, "err_login_failed", "Administrator account is locked."):
+			throw CPMError.accountLocked
+		case (400, "err_login_failed", let message)
+			where message?.hasSuffix("failed. Check that you have permission to login through API") == true:
 			throw CPMError.connectionProhibited
-		case 404:
+		case (404, let code, let message):
+			CheckPointManagement.logger.debug("DEBUG: invalid object. Code: \(String(describing: code), privacy: .public), message: \(String(describing: message), privacy: .public).")
 			throw CPMError.invalidObject
-		case 503:
+		case (503, nil, nil):
 			throw CPMError.apiDown
 		default:
 			CheckPointManagement.logger.error("ERROR: URL Session Task for \(String(describing: response.url?.absoluteString), privacy: .public) failed: HTTP \(response.statusCode, privacy: .public).")

@@ -67,7 +67,7 @@ import Testing
 		let policyDict = try #require(JSONSerialization.jsonObject(with: policyData) as? [String: Sendable])
 		let policyUuid = try #require(UUID(uuidString: policyDict["uid"] as? String ?? ""))
 		let fwData = try await managementConnection.makeRawApiCall(
-			apiPoint: "/show-simple-gateway", requestBody: ["name": TestData.firewallName])
+			apiPoint: "/show-simple-cluster", requestBody: ["name": TestData.firewallName])
 		let fwDict = try #require(JSONSerialization.jsonObject(with: fwData) as? [String: Sendable])
 		let fwUuid = try #require(UUID(uuidString: fwDict["uid"] as? String ?? ""))
 		_ = try await managementConnection.pushPolicy(

@@ -51,19 +51,32 @@ import Testing
 			headerFields: nil)!)))
 	}
 	
-	@Test func handleApiErrors400() {
-		#expect(throws: CPMError.badCredentials) { try CheckPointManagement.handleApiReturnErrors((Data([0]), HTTPURLResponse(
-			url: TestData.badUrl,
-			statusCode: 400,
-			httpVersion: "2",
-			headerFields: nil)!)) }
+	@Test(arguments: UnitTests.badCredentialsExemplars)
+	func badCredentials(exemplar: (code: Int, body: Data)) {
+		#expect(throws: CPMError.badCredentials) {
+			try CheckPointManagement.handleApiReturnErrors((exemplar.body, HTTPURLResponse(
+				url: TestData.badUrl,
+				statusCode: exemplar.code,
+				httpVersion: "2",
+				headerFields: nil)!)) }
 	}
 	
-	@Test func handleApiErrors403() {
-		#expect(throws: CPMError.connectionProhibited) {
-			try CheckPointManagement.handleApiReturnErrors((Data([0]), HTTPURLResponse(
+	@Test(arguments: UnitTests.accountLockedExemplars)
+	func accountLocked(exemplar: (code: Int, body: Data)) {
+		#expect(throws: CPMError.accountLocked) {
+			try CheckPointManagement.handleApiReturnErrors((exemplar.body, HTTPURLResponse(
 				url: TestData.badUrl,
-				statusCode: 403,
+				statusCode: exemplar.code,
+				httpVersion: "2",
+				headerFields: nil)!)) }
+	}
+	
+	@Test(arguments: UnitTests.connectionProhibitedExemplars)
+	func connectionProhibited(exemplar: (code: Int, body: Data)) {
+		#expect(throws: CPMError.connectionProhibited) {
+			try CheckPointManagement.handleApiReturnErrors((exemplar.body, HTTPURLResponse(
+				url: TestData.badUrl,
+				statusCode: exemplar.code,
 				httpVersion: "2",
 				headerFields: nil)!)) }
 	}

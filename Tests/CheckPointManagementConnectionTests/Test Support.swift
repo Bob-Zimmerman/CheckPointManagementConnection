@@ -24,8 +24,8 @@ enum TestData {
 	
 	/// Some names of specific things which must exist:
 	static let noApiUser = "NoApi" // Has to be a valid user with no API permission
-	static let policyPackageName = "Standard"
-	static let firewallName = "BerlinFW"
+	static let policyPackageName = "OnlyHouston"
+	static let firewallName = "HoustonFW"
 	
 	/// And a few constants for bad things which must not exist in the config:
 	static let badUrl = URL(string: "data:text/plain,Hello World")!
