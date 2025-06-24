@@ -32,7 +32,7 @@ without a target server to connect to. In my [CPAPI-Test-Target](https://github.
 there are directions and files to build a suitable test target. With such a
 target running, the tests have 100% code coverage as of 2025-06-24.
 
-As of 2025-06-24, the purely local tests cover 56.2% of the code.
+As of 2025-06-24, the purely local tests cover 59.2% of the code.
 
 `Test Support.swift` contains a set of variables which the tests use. If you
 want to use your own test target, you can use it to customize the tests to match

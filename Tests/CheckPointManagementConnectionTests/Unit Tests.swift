@@ -227,8 +227,23 @@ import Testing
 }
 """.utf8)
 		let date: Date = try JSONDecoder().decode(CPMDate.self, from: jsonData).posix
-		print("Decoded date: \(date)")
-		print("Distance to target date: \(date.distance(to: Date(timeIntervalSince1970: 1728954738)))")
 		#expect(1 > abs(date.distance(to: Date(timeIntervalSince1970: 1728954738))))
+	}
+	
+	@Test func buildPolicyPushParameters() {
+		let sixBools: [Bool] = Array(1...6).map { _ in Bool.random() }
+		let pushParameters = PolicyPushParameters(
+		access: sixBools[0],
+		desktopSecurity: sixBools[1],
+		qos: sixBools[2],
+		threatPrevention: sixBools[3],
+		installOnAllClusterMembersOrFail: sixBools[4],
+		prepareOnly: sixBools[5])
+		#expect(sixBools[0] == pushParameters.access)
+		#expect(sixBools[1] == pushParameters.desktopSecurity)
+		#expect(sixBools[2] == pushParameters.qos)
+		#expect(sixBools[3] == pushParameters.threatPrevention)
+		#expect(sixBools[4] == pushParameters.installOnAllClusterMembersOrFail)
+		#expect(sixBools[5] == pushParameters.prepareOnly)
 	}
 }
