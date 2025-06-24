@@ -108,7 +108,7 @@ public actor CheckPointManagement {
 	///   - returned: The tuple returned by URLSession.data(for: URLRequest)
 	///
 	/// - Returns: The data from the URLSession
-	// swiftlint:disable:next cyclomatic_complexity
+	// swiftlint:disable:next cyclomatic_complexity function_body_length
 	internal static func handleApiReturnErrors(_ returned: (data: Data, response: URLResponse))
 	throws -> Data {
 		guard let response = returned.response as? HTTPURLResponse else {
