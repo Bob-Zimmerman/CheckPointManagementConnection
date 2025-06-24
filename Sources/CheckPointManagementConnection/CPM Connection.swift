@@ -100,42 +100,77 @@ public actor CheckPointManagement {
 	
 	/// Handle errors within the API response.
 	///
-	/// This is carved off to a separate function to allow better test coverage.
+	/// This is carved off to a separate function to allow better test coverage. It is expected to have high
+	/// cyclomatic complexity, since it needs to be able to identify a lot of distinct errors. Each code path
+	/// should be relatively simple, handling only a specific type of error.
 	///
 	/// - Parameters:
 	///   - returned: The tuple returned by URLSession.data(for: URLRequest)
 	///
 	/// - Returns: The data from the URLSession
+	// swiftlint:disable:next cyclomatic_complexity
 	internal static func handleApiReturnErrors(_ returned: (data: Data, response: URLResponse))
 	throws -> Data {
 		guard let response = returned.response as? HTTPURLResponse else {
 			CheckPointManagement.logger.error("ERROR: Couldn't convert API call response to an HTTP URL Response")
 			throw DecodingError.typeMismatch(HTTPURLResponse.self, DecodingError.Context(
 				codingPath: [], debugDescription: "Couldn't convert API call response to an HTTP URL Response")) }
-		if response.statusCode == 200 { return returned.data }
-		
 		let apiError = try? JSONDecoder().decode(CPMApiError.self, from: returned.data)
 		
 		// TODO: Get error exemplars and make more robust error handling.
 		// Check Point doesn't seem to use HTTP return codes consistently.
 		switch (response.statusCode, apiError?.code, apiError?.message) {
-		case (400, "err_login_failed", "Authentication to server failed."):
+		case (200, nil, nil):
+			return returned.data
+		case (500, "generic_error", "Authentication to server failed."),
+			(400, "err_login_failed", "Authentication to server failed."):
 			throw CPMError.badCredentials
-		case (400, "err_login_failed", "Administrator account is locked."):
+		case (500, "generic_error", "Administrator account is locked."),
+			(400, "err_login_failed", "Administrator account is locked."):
 			throw CPMError.accountLocked
-		case (400, "err_login_failed", let message)
+		case (500, "generic_error", let message)
+			where message?.hasSuffix("failed. Check that you have permission to login through API") == true,
+			(400, "err_login_failed", let message)
 			where message?.hasSuffix("failed. Check that you have permission to login through API") == true:
 			throw CPMError.connectionProhibited
+		case (400, "err_unknown_api_version", let message) where message?.hasPrefix("Unknown API version:") == true:
+			throw CPMError.unknownApiVersion
+		case (503, nil, nil):
+			throw CPMError.apiDown
 		case (404, let code, let message):
 			CheckPointManagement.logger.debug("DEBUG: invalid object. Code: \(String(describing: code), privacy: .public), message: \(String(describing: message), privacy: .public).")
 			throw CPMError.invalidObject
-		case (503, nil, nil):
-			throw CPMError.apiDown
+		case (500, "generic_error", let message) where message?.hasPrefix("Validation failed") == true,
+			(400, "err_validation_failed", let message) where message?.hasPrefix("Validation failed") == true:
+			var userInfo = [NSLocalizedDescriptionKey: apiError?.code,
+					 NSLocalizedFailureReasonErrorKey: apiError?.message]
+			if let errors = apiError?.errors, !errors.isEmpty {
+				userInfo[NSUnderlyingErrorKey] = String(errors.reduce("") { $0 + "\n" + $1.message }.dropFirst()) }
+			let toThrow = NSError(domain: CPMError.validationFailed.domain,
+								  code: CPMError.validationFailed.code,
+								  userInfo: userInfo as [String: Any])
+			throw toThrow
+		case (500, "err_policy_installation_failed", let message),
+			(409, "err_policy_installation_failed", let message):
+			var userInfo = [NSLocalizedDescriptionKey: apiError?.code,
+					 NSLocalizedFailureReasonErrorKey: message]
+			let toThrow = NSError(domain: CPMError.policyInstallationFailed.domain,
+								  code: CPMError.policyInstallationFailed.code,
+								  userInfo: userInfo as [String: Any])
+			throw toThrow
 		default:
 			CheckPointManagement.logger.error("ERROR: URL Session Task for \(String(describing: response.url?.absoluteString), privacy: .public) failed: HTTP \(response.statusCode, privacy: .public).")
 			CheckPointManagement.logger.error("ERROR: Fetched data:")
 			CheckPointManagement.logger.error("\(String(describing: String(data: returned.data, encoding: .utf8)))")
-			throw CPMError.unknownError
+			guard let apiError = apiError else { throw CPMError.unknownError }
+			var userInfo = [NSLocalizedDescriptionKey: apiError.code,
+					 NSLocalizedFailureReasonErrorKey: apiError.message]
+			if let errors = apiError.errors, !errors.isEmpty {
+				userInfo[NSUnderlyingErrorKey] = String(errors.reduce("") { $0 + "\n" + $1.message }.dropFirst()) }
+			let toThrow = NSError(domain: CPMError.unknownError.domain,
+								  code: CPMError.unknownError.code,
+								  userInfo: userInfo as [String: Any])
+			throw toThrow
 		}
 	}
 	

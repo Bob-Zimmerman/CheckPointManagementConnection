@@ -5,6 +5,7 @@
 		trailing_whitespace,
 	],
 	"line_length": {
-	    "ignores_interpolated_strings": true
+	    "ignores_interpolated_strings": true,
+	    "ignores_multiline_strings": true
 	}
 }

@@ -81,6 +81,55 @@ import Testing
 				headerFields: nil)!)) }
 	}
 	
+	@Test(arguments: UnitTests.unknownApiVersionExemplars)
+	func unknownApiVersion(exemplar: (code: Int, body: Data)) {
+		#expect(throws: CPMError.unknownApiVersion) {
+			try CheckPointManagement.handleApiReturnErrors((exemplar.body, HTTPURLResponse(
+				url: TestData.badUrl,
+				statusCode: exemplar.code,
+				httpVersion: "2",
+				headerFields: nil)!)) }
+	}
+	
+	@Test(arguments: UnitTests.invalidObjectExemplars)
+	func invalidObject(exemplar: (code: Int, body: Data)) {
+		#expect(throws: CPMError.invalidObject) {
+			try CheckPointManagement.handleApiReturnErrors((exemplar.body, HTTPURLResponse(
+				url: TestData.badUrl,
+				statusCode: exemplar.code,
+				httpVersion: "2",
+				headerFields: nil)!)) }
+	}
+	
+	@Test(arguments: UnitTests.validationFailedExemplars)
+	func validationFailed(exemplar: (code: Int, body: Data)) {
+		#expect {
+			try CheckPointManagement.handleApiReturnErrors((exemplar.body, HTTPURLResponse(
+				url: TestData.badUrl,
+				statusCode: exemplar.code,
+				httpVersion: "2",
+				headerFields: nil)!)) } throws: { (error) in
+					let error = error as NSError
+					try #require((CPMError.validationFailed.domain, CPMError.validationFailed.code) == (error.domain, error.code))
+					return true
+				}
+	}
+	
+	@Test(arguments: UnitTests.policyInstallationFailedExemplars)
+	func policyInstallationFailed(exemplar: (code: Int, body: Data)) {
+		#expect {
+			try CheckPointManagement.handleApiReturnErrors((exemplar.body, HTTPURLResponse(
+				url: TestData.badUrl,
+				statusCode: exemplar.code,
+				httpVersion: "2",
+				headerFields: nil)!)) } throws: { (error) in
+					let error = error as NSError
+					try #require((CPMError.policyInstallationFailed.domain, CPMError.policyInstallationFailed.code)
+								 == (error.domain, error.code))
+					return true
+				}
+	}
+	
 	@Test func handleApiErrors503() {
 		#expect(throws: CPMError.apiDown) { try CheckPointManagement.handleApiReturnErrors((Data([0]), HTTPURLResponse(
 			url: TestData.badUrl,
@@ -101,12 +150,26 @@ import Testing
 			}
 	}
 	
-	@Test func handleApiErrorsUnhandledCode() {
+	@Test func unhandledErrorGeneric() {
 		#expect(throws: CPMError.unknownError) { try CheckPointManagement.handleApiReturnErrors((Data([0]), HTTPURLResponse(
 			url: TestData.badUrl,
 			statusCode: 0,
 			httpVersion: "2",
 			headerFields: nil)!)) }
+	}
+	
+	@Test func unhandledErrorWithDetails() {
+		#expect { try CheckPointManagement.handleApiReturnErrors((Data("""
+  {"code":"err_fake_code","message":"Fake error message.","errors":[{"message":"Something is very wrong!"}]}
+""".utf8), HTTPURLResponse(
+			url: TestData.badUrl,
+			statusCode: 0,
+			httpVersion: "2",
+			headerFields: nil)!)) } throws: { (error) in
+				let error = error as NSError
+				try #require((CPMError.unknownError.domain, CPMError.unknownError.code) == (error.domain, error.code))
+				return true
+			}
 	}
 	
 	@Test func firstTaskBadData() throws {

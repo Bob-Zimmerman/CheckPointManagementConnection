@@ -30,9 +30,9 @@ Testing
 A lot of the code involves network calls, and obviously those are hard to test
 without a target server to connect to. In my [CPAPI-Test-Target](https://github.com/Bob-Zimmerman/CPAPI-Test-Target/) repository,
 there are directions and files to build a suitable test target. With such a
-target running, the tests have 100% code coverage as of 2025-06-18.
+target running, the tests have 100% code coverage as of 2025-06-24.
 
-As of 2025-06-18, the purely local tests cover 47.8% of the code.
+As of 2025-06-24, the purely local tests cover 56.2% of the code.
 
 `Test Support.swift` contains a set of variables which the tests use. If you
 want to use your own test target, you can use it to customize the tests to match

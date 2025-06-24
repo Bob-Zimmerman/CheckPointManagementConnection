@@ -10,9 +10,6 @@ import Foundation
 public let CPMAPIErrorDomain: String = "CPMAPIErrorDomain"
 
 public enum CPMError: Error {
-	public static let unknownError = NSError(domain: CPMAPIErrorDomain, code: -1, userInfo: [
-		NSLocalizedDescriptionKey: NSLocalizedString("Unknown Error", comment: "A connection error indicating something has gone wrong, but I don't yet handle it."), // swiftlint:disable:this line_length
-		NSLocalizedRecoverySuggestionErrorKey: NSLocalizedString("Something has gone wrong in a way I have never seen before and don't currently handle.", comment: "Informative text describing a connection error.") ]) // swiftlint:disable:this line_length
 	public static let apiDown = NSError(domain: CPMAPIErrorDomain, code: -2, userInfo: [
 		NSLocalizedDescriptionKey: NSLocalizedString("API Appears to be Down", comment: "A connection error indicating the server responded to our request, but that the response indicated the service has failed."), // swiftlint:disable:this line_length
 		NSLocalizedRecoverySuggestionErrorKey: NSLocalizedString("It looks like we can reach the server, but the API service is down. Please check the API status.", comment: "Informative text describing a connection error.") ]) // swiftlint:disable:this line_length
@@ -32,13 +29,25 @@ public enum CPMError: Error {
 		NSLocalizedDescriptionKey: NSLocalizedString("Call made to change an invalid object", comment: "An error indicating the user has tried to perform an action, but the object they tried to perform it on doesn't exist."), // swiftlint:disable:this line_length
 		NSLocalizedRecoverySuggestionErrorKey: NSLocalizedString("You made a call to perform an action with an object, but the object doesn't exist.", comment: "Informative text describing a session error.") ]) // swiftlint:disable:this line_length
 	public static let accountLocked = NSError(domain: CPMAPIErrorDomain, code: -6, userInfo: [
-		NSLocalizedDescriptionKey: NSLocalizedString("Admin account locked", comment: "An error indicating the tried to log in to an admin account, but it's locked."), // swiftlint:disable:this line_length
+		NSLocalizedDescriptionKey: NSLocalizedString("Admin account locked", comment: "An error indicating the user tried to log in to an admin account, but it's locked."), // swiftlint:disable:this line_length
 		NSLocalizedRecoverySuggestionErrorKey: NSLocalizedString("Your credentials were accepted, but your account is locked. Contact another administrator to unlock your account.", comment: "Informative text describing a session error.") ]) // swiftlint:disable:this line_length
+	public static let unknownApiVersion = NSError(domain: CPMAPIErrorDomain, code: -7, userInfo: [
+		NSLocalizedDescriptionKey: NSLocalizedString("Unknown API version", comment: "An error indicating a call tried to use an API version which the management does not support."), // swiftlint:disable:this line_length
+		NSLocalizedRecoverySuggestionErrorKey: NSLocalizedString("The management server doesn't know about the version of the API you're trying to use. You probably need to upgrade the management server.", comment: "Informative text describing a session error.") ]) // swiftlint:disable:this line_length
+	
+	// These are placeholders. They should only be directly thrown if we get an
+	// error, but can't get any more details about what went wrong.
+	public static let unknownError = NSError(domain: CPMAPIErrorDomain, code: -1, userInfo: [
+		NSLocalizedDescriptionKey: NSLocalizedString("Unknown Error", comment: "A connection error indicating something has gone wrong, but I don't yet handle it."), // swiftlint:disable:this line_length
+		NSLocalizedRecoverySuggestionErrorKey: NSLocalizedString("Something has gone wrong in a way I have never seen before and don't currently handle.", comment: "Informative text describing a connection error.") ]) // swiftlint:disable:this line_length
+	public static let validationFailed = NSError(domain: CPMAPIErrorDomain, code: -8, userInfo: [:])
+	public static let policyInstallationFailed = NSError(domain: CPMAPIErrorDomain, code: -9, userInfo: [:])
 }
 
 public struct CPMApiError: Error, Decodable, Sendable {
 	public let code: String
 	public let message: String
+	public let warnings: [CPMApiErrorDetail]?
 	public let errors: [CPMApiErrorDetail]?
 }
 

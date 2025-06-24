@@ -89,6 +89,25 @@ import Testing
 		try await Task.sleep(nanoseconds: 1_000_000_000)
 		try await tearDown()
 	}
+	
+	@Test func buildDuplicateObject() async throws {
+		let managementConnection = try #require(managementConnection)
+		let hostDict = ["name": "TestHost",
+						"ipv4-address": "10.20.30.40"]
+		await #expect(throws: Never.self) {
+			_ = try await managementConnection.makeRawApiCall(apiPoint: "add-host", requestBody: hostDict)
+		}
+		await #expect {
+			_ = try await managementConnection.makeRawApiCall(apiPoint: "add-host", requestBody: hostDict)
+		} throws: { (error) in
+			let error = error as NSError
+			guard CPMError.validationFailed.domain == error.domain,
+				  CPMError.validationFailed.code == error.code
+			else { Issue.record("Wrong error case"); return false }
+			try await tearDown()
+			return true
+		}
+	}
 }
 
 @Suite(.serialized, .tags(.serverRequired)) struct ApiCallTestsSelfContained {
